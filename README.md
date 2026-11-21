@@ -15,7 +15,7 @@ Tampermonkey icon → **GitHub Wide** → **Max width: … (change)**. Enter `no
 
 ## How it works
 
-One CSS block sets `max-width` (default `none`) on GitHub's layout containers. GitHub's React classes carry build hashes (`prc-PageLayout-Content-xWL-A`), so the script matches them by prefix. If GitHub renames a container and a page goes narrow again, open an issue with the page URL.
+The script widens only what GitHub itself caps. It marks every element whose native `max-width` is a fixed layout width (1000 px or more) and overrides just those. Pages GitHub already shows full width, like project boards, stay as they are. GitHub renders pages client-side, so the script rescans after DOM changes.
 
 ## License
 

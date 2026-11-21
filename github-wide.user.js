@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub: Full Width
 // @namespace    https://github.com/christoph-teichmeister/github-wide
-// @version      1.3.0
+// @version      2.0.0
 // @description  Removes the max-width limit on GitHub pages so content uses the full window width (configurable).
 // @author       christoph-teichmeister
 // @match        https://github.com/*
@@ -28,24 +28,16 @@ GM_registerMenuCommand(`Max width: ${maxWidth} (change)`, () => {
   location.reload();
 });
 
+// Only widen what GitHub itself caps. Class names change and differ per page
+// (contentContainer__…, Container__…, container-xl), so instead of a selector list
+// we mark every div whose native max-width is a fixed layout width (>= 1000px).
+// Pages GitHub already shows full width (project boards) have none and stay untouched.
+// Dialogs are skipped: they have their own caps.
+const MARK = 'data-gh-wide';
+const MIN_CAP = 1000;
+
 GM_addStyle(`
-  /* Classic layout containers */
-  .container, .container-md, .container-lg, .container-xl,
-
-  /* React PageLayout (class names carry hashes, so match by prefix) */
-  [class*="PageLayout-PageLayoutWrapper"],
-  [class*="PageLayout-PageLayoutContent"],
-  [class*="PageLayout-ContentWrapper"],
-  [class*="PageLayout-Content-"],
-  [class*="PageLayout-Header"],
-
-  /* Issue / PR view */
-  [class*="contentAndSidebarWrapper"],
-  [class*="IssueContent"],
-  [class*="contentContainer"],
-  [class*="PageHeader-Title"] {
-    max-width: ${maxWidth} !important;
-  }
+  [${MARK}] { max-width: ${maxWidth} !important; }
 
   /* Flex children default to min-width:auto and would grow past the window
      to fit long titles; let them shrink instead. */
@@ -54,3 +46,20 @@ GM_addStyle(`
     min-width: 0 !important;
   }
 `);
+
+function mark() {
+  for (const el of document.querySelectorAll(`body div:not([${MARK}])`)) {
+    const cap = getComputedStyle(el).maxWidth;
+    if (cap.endsWith('px') && parseFloat(cap) >= MIN_CAP && !el.closest('dialog, [role="dialog"]')) {
+      el.setAttribute(MARK, '');
+    }
+  }
+}
+
+// GitHub renders client-side (React, Turbo), so rescan after DOM changes.
+// ponytail: full div scan per burst (~50 ms on big pages), debounced; narrow it if it ever lags.
+let timer;
+new MutationObserver(() => {
+  clearTimeout(timer);
+  timer = setTimeout(mark, 150);
+}).observe(document.documentElement, { childList: true, subtree: true });
