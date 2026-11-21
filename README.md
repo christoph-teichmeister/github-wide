@@ -1,4 +1,4 @@
-# GitHub Wide
+# GitHub: Full Width
 
 Tampermonkey / Violentmonkey userscript that removes GitHub's max-width limit, so issues, PRs, repos and settings use the full window width instead of a narrow centered column.
 
