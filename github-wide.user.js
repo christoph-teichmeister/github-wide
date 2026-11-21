@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub Wide
 // @namespace    https://github.com/christoph-teichmeister/github-wide
-// @version      1.0.0
+// @version      1.1.0
 // @description  Removes the max-width limit on GitHub pages so content uses the full window width.
 // @author       christoph-teichmeister
 // @match        https://github.com/*
@@ -25,7 +25,16 @@ GM_addStyle(`
 
   /* Issue / PR view */
   [class*="contentAndSidebarWrapper"],
-  [class*="IssueContent"] {
+  [class*="IssueContent"],
+  [class*="contentContainer"],
+  [class*="PageHeader-Title"] {
     max-width: none !important;
+  }
+
+  /* Flex children default to min-width:auto and would grow past the window
+     to fit long titles; let them shrink instead. */
+  [class*="PageLayout-PageLayoutContent"],
+  [class*="PageLayout-Content-"] {
+    min-width: 0 !important;
   }
 `);
