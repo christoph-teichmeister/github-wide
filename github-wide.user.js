@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub: Full Width
 // @namespace    https://github.com/christoph-teichmeister/github-wide
-// @version      2.0.0
+// @version      2026.11.1
 // @description  Removes the max-width limit on GitHub pages so content uses the full window width (configurable).
 // @author       christoph-teichmeister
 // @match        https://github.com/*
